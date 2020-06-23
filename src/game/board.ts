@@ -1,12 +1,14 @@
 import * as PIXI from "pixi.js";
 import Shape from "./shape";
 import { Cell, ShapeData } from "../services/globals";
+import RLC from "../services/responsive-layout-calculator";
+import MainBox from "./main-box";
 
 export default class Board extends PIXI.Container {
   private readonly boardWidth = 3;
   private readonly boardHeight = 12;
-  private readonly boardOffset = new PIXI.Point(64, 64);
-  private readonly cellSize = 64;
+  readonly boardOffset = new PIXI.Point(RLC.BOX_WIDTH - 256, 128);
+  readonly cellSize = 64;
 
   private gridGraphics = new PIXI.Graphics;
   private boardGraphics = new PIXI.Graphics;
@@ -14,16 +16,21 @@ export default class Board extends PIXI.Container {
 
   private boardMatrix: Cell[][];
 
-  private currentShape!: Shape;
+  currentShape!: Shape;
 
   private fullRows: number[] = [];
 
   shapeFalling = false;
   removingRows = false;
 
-  constructor(parent: PIXI.Container) {
+  gameover = false;
+
+  parent: MainBox;
+
+  constructor(parent: MainBox) {
     super();
     parent.addChild(this);
+    this.parent = parent;
 
     this.addChild(this.gridGraphics);
     this.addChild(this.boardGraphics);
@@ -131,7 +138,6 @@ export default class Board extends PIXI.Container {
       }
     }
 
-    console.log(fullRows);
     return fullRows;
   }
 
@@ -142,6 +148,7 @@ export default class Board extends PIXI.Container {
         cell.fill = false;
         delete cell.color;
       });
+      this.parent.changeScore();
     });
   }
 
@@ -160,12 +167,12 @@ export default class Board extends PIXI.Container {
     this.removingRows = false;
   }
 
-  validatePosition(position: PIXI.Point, shape: Shape = this.currentShape): boolean {
+  validatePosition(position: PIXI.Point, matrix: number[][] = this.currentShape.matrix): boolean {
     let valid = true;
-    const n = shape.matrix.length;
+    const n = matrix.length;
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
-        const currentShapeCell = shape.matrix[i][j];
+        const currentShapeCell = matrix[i][j];
         if (currentShapeCell === 1) {
           const nextBoardRow = this.boardMatrix[i + position.y];
           if (typeof nextBoardRow === "undefined") {

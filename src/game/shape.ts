@@ -1,17 +1,20 @@
 import * as PIXI from "pixi.js";
 import { ShapeData, shapes, colors, } from '../services/globals';
 import Board from "./board";
-
 export default class Shape extends PIXI.Graphics {
   matrix: number[][];
   color: number;
   matrixPos: PIXI.Point;
+
+  parent: Board;
 
   constructor(parent: Board, shapeData: ShapeData) {
     super();
     parent.addChild(this);
 
     const { typ, rot, pos } = shapeData;
+
+    this.parent = parent;
 
     this.matrix = shapes[typ];
     this.matrixPos = new PIXI.Point(pos, 0);
@@ -26,10 +29,14 @@ export default class Shape extends PIXI.Graphics {
       }
     }
 
-    const validPosition = parent.validatePosition(this.matrixPos, this);
+    const validPosition = parent.validatePosition(this.matrixPos, this.matrix);
     // Due to only 3-width-grid if initial position is not valid it will just go to middle
     if (!validPosition) {
       this.matrixPos.x = 0;
+      const validSpawn = parent.validatePosition(this.matrixPos, this.matrix);
+      if (!validSpawn) {
+        parent.gameover = true;
+      }
     }
   }
 
@@ -48,7 +55,8 @@ export default class Shape extends PIXI.Graphics {
     return rotatedShape;
   }
 
-  draw(cellSize: number, boardOffset: PIXI.Point): void {
+  draw(): void {
+    const { cellSize, boardOffset } = this.parent
     const { matrix, matrixPos, color } = this;
 
     this.clear();
@@ -72,4 +80,25 @@ export default class Shape extends PIXI.Graphics {
   fall(): void {
     this.matrixPos.y += 1;
   }
+
+  move(direction: number): void {
+    // console.log("moved to: " + direction);
+    const newPos = new PIXI.Point(this.matrixPos.x + direction, this.matrixPos.y);
+    const valid = this.parent.validatePosition(newPos, this.matrix);
+    if (valid) {
+      this.matrixPos.x += direction;
+      this.draw();
+    }
+  }
+
+  rotate(clockwise: boolean): void {
+    // console.log("rotated clockwise: " + clockwise);
+    const newMatrix = this.rotateMatrix(this.matrix, clockwise);
+    const valid = this.parent.validatePosition(this.matrixPos, newMatrix);
+    if (valid) {
+      this.matrix = newMatrix;
+      this.draw();
+    }
+  }
 }
+

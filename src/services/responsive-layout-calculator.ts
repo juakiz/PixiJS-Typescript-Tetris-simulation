@@ -48,3 +48,5 @@ export default class RLC {
     RLC.TOTAL_HEIGHT = RLC.BOT - RLC.TOP;
   }
 }
+
+RLC.resize();
