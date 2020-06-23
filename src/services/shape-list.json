@@ -2,8 +2,8 @@
   "list": [
     {
       "typ": 0,
-      "pos": 0,
-      "rot": 0
+      "pos": -1,
+      "rot": -2
     },
     {
       "typ": 1,
@@ -12,8 +12,8 @@
     },
     {
       "typ": 2,
-      "pos": 0,
-      "rot": 2
+      "pos": -1,
+      "rot": 1
     },
     {
       "typ": 3,
@@ -22,15 +22,8 @@
     },
     {
       "typ": 4,
-      "pos": 0,
+      "pos": 1,
       "rot": 4
     }
-  ],
-  "shapes": [
-    "violet",
-    "purple",
-    "lime",
-    "yellow",
-    "cyan"
   ]
 }

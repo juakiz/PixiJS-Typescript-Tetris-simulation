@@ -20,9 +20,6 @@ export default class RLC {
   static TOTAL_WIDTH: number;
   static TOTAL_HEIGHT: number;
 
-  // static BOX_X: number;
-  // static BOX_Y: number;
-
   constructor() {
     throw new Error('AbstractClassError');
   }
@@ -51,5 +48,3 @@ export default class RLC {
     RLC.TOTAL_HEIGHT = RLC.BOT - RLC.TOP;
   }
 }
-
-// RLC.resize();

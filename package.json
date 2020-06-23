@@ -1,7 +1,7 @@
 {
-    "name": "pixi-typescript-boilerplate",
-    "version": "2.3.0",
-    "description": "pixi.js typescript boilerplate",
+    "name": "tetis-simulation",
+    "version": "1.0.0",
+    "description": "A pixi.js typescript test",
     "scripts": {
         "test": "npx jest",
         "code-coverage": "jest --coverage",
@@ -14,7 +14,6 @@
         "lint-check": "npx eslint ./src/**/*.ts",
         "code-style-check": "npm run lint-check && npm run pretty-check"
     },
-    "author": "jkanchelov",
     "license": "MIT",
     "dependencies": {
         "pixi.js": "^5.2.4"
