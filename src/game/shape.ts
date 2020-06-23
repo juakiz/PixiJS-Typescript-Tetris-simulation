@@ -30,7 +30,6 @@ export default class Shape extends PIXI.Graphics {
     // Due to only 3-width-grid if initial position is not valid it will just go to middle
     if (!validPosition) {
       this.matrixPos.x = 0;
-      this.matrixPos.y = 0;
     }
   }
 

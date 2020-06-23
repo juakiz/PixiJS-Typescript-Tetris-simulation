@@ -20,7 +20,7 @@ export default class MainBox extends PIXI.Container {
 
     this.board = new Board(this);
 
-    console.log(data);
+    // console.log(data);
 
     this.jsonData = data.list;
 
@@ -41,7 +41,7 @@ export default class MainBox extends PIXI.Container {
     if (this.board.shapeFalling) {
       this.board.fallShape();
     } else if (this.board.removingRows) {
-
+      this.board.fallBoardcells();
     } else {
       const shapeData = this.jsonData.shift();
       if (typeof shapeData !== "undefined") {

@@ -8,13 +8,15 @@ export default class Board extends PIXI.Container {
   private readonly boardOffset = new PIXI.Point(64, 64);
   private readonly cellSize = 64;
 
-  private gridGraphics: PIXI.Graphics;
-  private boardGraphics: PIXI.Graphics;
-  private shapeGraphics: PIXI.Graphics;
+  private gridGraphics = new PIXI.Graphics;
+  private boardGraphics = new PIXI.Graphics;
+  private shapeGraphics = new PIXI.Graphics;
 
   private boardMatrix: Cell[][];
 
   private currentShape!: Shape;
+
+  private fullRows: number[] = [];
 
   shapeFalling = false;
   removingRows = false;
@@ -23,11 +25,8 @@ export default class Board extends PIXI.Container {
     super();
     parent.addChild(this);
 
-    this.gridGraphics = new PIXI.Graphics;
     this.addChild(this.gridGraphics);
-    this.boardGraphics = new PIXI.Graphics;
     this.addChild(this.boardGraphics);
-    this.shapeGraphics = new PIXI.Graphics;
     this.addChild(this.shapeGraphics);
 
     this.boardMatrix = [];
@@ -106,9 +105,59 @@ export default class Board extends PIXI.Container {
       this.shapeFalling = false;
       this.currentShape.destroy();
       delete this.currentShape;
+
+      this.fullRows = this.checkFullRows();
+      if (this.fullRows.length > 0) {
+        this.removingRows = true;
+        this.removeRows();
+      }
     } else {
       this.currentShape.fall();
     }
+  }
+
+  checkFullRows(): number[] {
+    const fullRows = [];
+    let count;
+    for (let i = 0; i < this.boardMatrix.length; i++) {
+      count = 0;
+      for (let j = 0; j < this.boardMatrix[i].length; j++) {
+        if (this.boardMatrix[i][j].fill) {
+          count++;
+        }
+      }
+      if (count === this.boardMatrix[i].length) {
+        fullRows.push(i);
+      }
+    }
+
+    console.log(fullRows);
+    return fullRows;
+  }
+
+  removeRows(): void {
+    const rows = this.fullRows;
+    rows.forEach(row => {
+      this.boardMatrix[row].forEach(cell => {
+        cell.fill = false;
+        delete cell.color;
+      });
+    });
+  }
+
+  fallBoardcells(): void {
+    const rows = this.fullRows;
+    rows.forEach(row => {
+      for (let i = row; i > 0; i--) {
+        for (let j = 0; j < 3; j++) {
+          this.boardMatrix[i][j].fill = this.boardMatrix[i - 1][j].fill;
+          this.boardMatrix[i][j].color = this.boardMatrix[i - 1][j].color;
+          this.boardMatrix[i - 1][j].fill = false;
+          delete this.boardMatrix[i - 1][j].color;
+        }
+      }
+    });
+    this.removingRows = false;
   }
 
   validatePosition(position: PIXI.Point, shape: Shape = this.currentShape): boolean {
@@ -117,12 +166,15 @@ export default class Board extends PIXI.Container {
     for (let i = 0; i < n; i++) {
       for (let j = 0; j < n; j++) {
         const currentShapeCell = shape.matrix[i][j];
-        if (typeof this.boardMatrix[i + position.y] === "undefined") {
-          valid = false;
-        } else {
-          const nextBoardCell = this.boardMatrix[i + position.y][j + position.x];
-          if (currentShapeCell === 1 && (typeof nextBoardCell === "undefined" || nextBoardCell.fill))
+        if (currentShapeCell === 1) {
+          const nextBoardRow = this.boardMatrix[i + position.y];
+          if (typeof nextBoardRow === "undefined") {
             valid = false;
+          } else {
+            const nextBoardCell = nextBoardRow[j + position.x];
+            if (typeof nextBoardCell === "undefined" || nextBoardCell.fill)
+              valid = false;
+          }
         }
       }
     }
