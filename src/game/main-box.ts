@@ -11,7 +11,7 @@ export default class MainBox extends PIXI.Container {
   private jsonData: ShapeData[];
 
   private gameUpdateInterval: NodeJS.Timeout;
-  private readonly timeInterval = 300;
+  private readonly timeInterval = 450;
 
   private score = 0;
   private scoreTxt: PIXI.Text;
@@ -60,6 +60,13 @@ export default class MainBox extends PIXI.Container {
       if (typeof this.board.currentShape !== "undefined")
         this.board.currentShape.rotate(true);
     };
+    keyboard("ArrowDown").press = (): void => {
+      if (typeof this.board.currentShape !== "undefined") {
+        this.gameUpdate.call(this)
+        this.gameUpdateInterval = setInterval(this.gameUpdate.bind(this), this.timeInterval);
+        clearInterval(this.gameUpdateInterval);
+      }
+    };
   }
 
   createScoreText(): PIXI.Text {
@@ -81,7 +88,11 @@ export default class MainBox extends PIXI.Container {
   }
 
   createInfoText(): PIXI.Text {
-    const initialText = 'Press left/right to move.\nPress A to rotate left\nand D to rotate right.';
+    const initialText =
+      `Press right-left to move,
+A to rotate left,
+D to rotate right
+and down to fall faster.`;
     const txt = new PIXI.Text(initialText, {
       fontFamily: 'Press Start 2P',
       fontSize: 30,
@@ -113,7 +124,7 @@ export default class MainBox extends PIXI.Container {
     if (this.board.gameover) {
       clearInterval(this.gameUpdateInterval);
       this.changeInfoText("Game Over");
-      console.log("Game Over");
+      // console.log("Game Over");
     } else {
       if (this.board.shapeFalling) {
         this.board.fallShape();
@@ -125,7 +136,7 @@ export default class MainBox extends PIXI.Container {
           this.board.addShape(shapeData);
         } else {
           clearInterval(this.gameUpdateInterval);
-          console.log("No More Shapes");
+          // console.log("No More Shapes");
           this.changeInfoText("No More Shapes");
         }
       }
