@@ -191,6 +191,6 @@ export default class Board extends PIXI.Container {
   draw(): void {
     this.drawBoard();
     if (typeof this.currentShape !== "undefined")
-      this.currentShape.draw(this.cellSize, this.boardOffset);
+      this.currentShape.draw();
   }
 }
